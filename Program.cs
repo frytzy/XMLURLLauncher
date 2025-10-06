@@ -2,77 +2,54 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Xml.Linq;
-using Microsoft.Win32;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         try
         {
-            // Get the directory of the executable
-            string exePath = AppDomain.CurrentDomain.BaseDirectory;
-            string xmlPath = Path.Combine(exePath, "config.xml");
-
-            // Check if the XML file exists
+            // Get the directory where the executable is located
+            string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+            string xmlPath = Path.Combine(exeDir, "config.xml");
+            
+            // Check if config file exists
             if (!File.Exists(xmlPath))
             {
-                Console.WriteLine("Config file not found.");
+                Console.WriteLine($"Error: config.xml not found at {xmlPath}");
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
                 return;
             }
-
-            // Load and parse the XML file
-            XDocument doc = XDocument.Load(xmlPath);
-            string url = doc.Element("config")?.Element("url")?.Value;
-
-            // Verify that a URL was found
+            
+            // Read URL from XML
+            XDocument config = XDocument.Load(xmlPath);
+            string url = config.Root.Element("URL")?.Value;
+            
             if (string.IsNullOrEmpty(url))
             {
-                Console.WriteLine("URL not found in config file.");
+                Console.WriteLine("Error: URL not found in config.xml");
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
                 return;
             }
-
-            // Launch the URL with the default browser or Edge
-            if (IsDefaultBrowserSet())
+            
+            // Try to open with default browser
+            try
             {
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
             }
-            else
+            catch
             {
-                LaunchWithEdge(url);
+                // Fallback to Edge
+                Process.Start("msedge", url);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error: " + ex.Message);
-        }
-    }
-
-    static bool IsDefaultBrowserSet()
-    {
-        // Check the registry for the default browser setting
-        string userChoiceKey = @"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice";
-        using (RegistryKey key = Registry.CurrentUser.OpenSubKey(userChoiceKey))
-        {
-            if (key != null)
-            {
-                object progId = key.GetValue("ProgId");
-                return progId != null && !string.IsNullOrEmpty(progId.ToString());
-            }
-            return false;
-        }
-    }
-
-    static void LaunchWithEdge(string url)
-    {
-        try
-        {
-            // Launch the URL with Microsoft Edge
-            Process.Start("msedge", url);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Failed to launch Edge: " + ex.Message);
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
     }
 }
