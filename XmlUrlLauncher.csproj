@@ -6,6 +6,7 @@
     <RootNamespace>URLLauncher</RootNamespace>
     <Version>1.0.0</Version>
     <Description>Launches URLs from config.xml in default browser</Description>
-    <Authors>YourName</Authors>
+    <Authors>SuperComputerInc</Authors>
   </PropertyGroup>
 </Project>
+
