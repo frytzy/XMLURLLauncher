@@ -16,7 +16,7 @@ class Program
             // Check if config file exists
             if (!File.Exists(xmlPath))
             {
-                Console.WriteLine($"Error: config.xml not found at {xmlPath}");
+                Console.WriteLine("Error: config.xml not found at " + xmlPath);
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
                 return;
@@ -24,7 +24,8 @@ class Program
             
             // Read URL from XML
             XDocument config = XDocument.Load(xmlPath);
-            string url = config.Root.Element("URL")?.Value;
+            XElement urlElement = config.Root.Element("URL");
+            string url = urlElement != null ? urlElement.Value : null;
             
             if (string.IsNullOrEmpty(url))
             {
@@ -47,9 +48,15 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine("Error: " + ex.Message);
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
         }
     }
 }
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
+        }
+    }
+}
+
